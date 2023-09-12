@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Книги</title>
+    <style>
+    table{width:100%;}
+    table td, table th { border: 1px solid grey;}
+    table th { background: #eee;}
+    .pagination-div{user-select: none;}
+    .pagination-div span{border-radius:3px;border:1px solid #999;
+       padding:5px;margin:10px 0px 0px 10px;display:inline-block}
+    span.selected{background:#ccf;}
+    </style>
+</head>
+<body>
+
+<div th:each="book : ${books.getContent}">
+    <a th:href="@{/books/{id}(id=${book.getId()})}"
+       th:text="${book.getTitle() + ', '+ book.getAuthor() + ', ' + book.getAge()}">user</a>
+</div>
+
+<br/>
+<hr/>
+
+<table>
+    <tr>
+        <th>id</th>
+        <th>Произведение</th>
+        <th>Автор</th>
+        <th>Дата написания произведения</th>
+    </tr>
+
+    <tr th:each="book : ${books.getContent()}">
+        <td>
+            <a th:href="@{/books/{id}(id=${book.getId()})}" th:text="${book.getId()}"></a>
+        </td>
+        <td>
+            <a th:href="@{/books/{id}(id=${book.getId()})}" th:text="${book.getTitle()}"></a>
+        </td>
+        <td th:text="${book.getAuthor()}"></td>
+        <td th:text="${book.getAge()}"></td>
+    </tr>
+
+</table>
+
+<div class="pagination-div">
+    <span th:if="${books.hasPrevious()}">
+        <a th:href="@{/books(page=${books.number-1},books_per_page=${books.size},sort_by_year=${sort})}">Previous</a>
+    </span>
+    <th:block th:each="i: ${#numbers.sequence(0, books.totalPages - 1)}">
+        <span th:if="${books.number == i}" class="selected">[[${i}+1]]</span>
+        <span th:unless="${books.number == i}">
+             <a th:href="@{/books(page=${i},books_per_page=${books.size},sort_by_year=${sort})}">[[${i}+1]]</a>
+        </span>
+    </th:block>
+    <span th:if="${books.hasNext()}">
+        <a th:href="@{/books(page=${books.number+1},books_per_page=${books.size},sort_by_year=${sort})}">Next</a>
+    </span>
+</div>
+<br/>
+<hr/>
+<a href="/books/new">Добавление нового произведения</a>
+
+<p>
+    <a th:href="@{/books}">Return to home</a>
+</p>
+</body>
+
+</html>
