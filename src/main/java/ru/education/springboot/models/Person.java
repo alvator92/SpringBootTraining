@@ -42,6 +42,9 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private Mood mood;
 
+    @Column(name = "password")
+    private String password;
+
     @Transient
     private boolean expired;
 
@@ -111,6 +114,14 @@ public class Person {
         this.mood = mood;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public boolean isExpired() {
         Calendar calendar = Calendar.getInstance();
         if (this.getCreatedAt() == null)
@@ -142,5 +153,20 @@ public class Person {
     @Override
     public int hashCode() {
         return Objects.hash(fullName, yearOfBirth, dateOfBirth, createdAt, bookList);
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "id=" + id +
+                ", fullName='" + fullName + '\'' +
+                ", yearOfBirth=" + yearOfBirth +
+                ", dateOfBirth=" + dateOfBirth +
+                ", createdAt=" + createdAt +
+                ", mood=" + mood +
+                ", password='" + password + '\'' +
+                ", expired=" + expired +
+                ", bookList=" + bookList +
+                '}';
     }
 }

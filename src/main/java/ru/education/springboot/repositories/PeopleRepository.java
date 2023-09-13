@@ -6,16 +6,16 @@ import ru.education.springboot.models.Book;
 import ru.education.springboot.models.Person;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PeopleRepository extends JpaRepository<Person, Integer> {
-    List<Person> findByFullName(String name);
+    Optional<Person> findByFullName(String name);
 
     List<Person> findByFullNameOrderByYearOfBirth(String name);
 
     List<Person> findByFullNameStartingWith(String startingWith);
 
     Person findByBookList(Book book);
-
 
 }
