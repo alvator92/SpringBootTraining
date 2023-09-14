@@ -27,7 +27,7 @@ public class PersonValidator implements Validator {
 
         // посмотерть есть ли такой же человек в БД
             if(personDao.show(person.getFullName()).isPresent()) {
-                errors.rejectValue("name", "", "Такое имя уже есть в Базе");
+                errors.rejectValue("fullName", "", "Такое имя уже есть в Базе");
             }
     }
 }
