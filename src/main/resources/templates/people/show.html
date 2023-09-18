@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Show</title>
+    <link media="all" rel="stylesheet" th:href="@{/css/table.css}" type="text/css"/>
+
 </head>
 <body>
-<p th:text="${person.getFullName() + ', ' + person.getYearOfBirth()}">VALUE</p>
-<p th:text="${person.getDateOfBirth()}">VALUE</p>
-<p th:text="${person.getCreatedAt()}">VALUE</p>
-<p th:text="${person.getId()}">VALUE</p>
-
+<h1>Список Книг</h1>
 <div th:if="${books.isEmpty()}">
     <p>Человек пока не взял ни одной книги</p>
     <hr/>

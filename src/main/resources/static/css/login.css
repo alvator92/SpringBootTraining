@@ -1,0 +1,18 @@
+@charset "ISO-8859-1";
+body {
+ background: #f0f4c3;
+}
+
+h1 {
+ font-family: inherit;
+ font-weight: bold;
+ align-content: center;
+
+}
+
+p {
+ font-family: inherit;
+ font-weight: bold;
+ font-size: 20px;
+ align-self: center;
+}

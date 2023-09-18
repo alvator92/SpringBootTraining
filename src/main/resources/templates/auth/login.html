@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Login page</title>
+  <link media="all" rel="stylesheet" th:href="@{/css/login.css}" type="text/css"/>
 </head>
 <body>
-
+<h1 >Страница авторизации</h1>
 <form name="f" method="post" action="/process_login">
   <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
