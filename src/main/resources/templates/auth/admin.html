@@ -2,15 +2,15 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Hello World</title>
+    <title>Admin Page</title>
 </head>
 <body>
-Hello World!
+<h1>Страница админа</h1>
+<a>Добро пожаловать</a>
+<br/>
 <!--POST запрос из формы-->
 <form th:action="@{/logout}" th:method="POST">
     <input type="submit" value="Logout"/>
 </form>
-<!--Get запрос-->
-<!--<a href="/logout">Logout</a>-->
 </body>
 </html>

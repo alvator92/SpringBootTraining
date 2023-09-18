@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.education.springboot.services.PersonDetailService;
@@ -25,27 +26,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // конфигурируем сам spring security
         // конфигурируем авторизацию
         // name="username" name="password" ждет из формы
-//        http.csrf().disable()   // отключаем защиту от межсайтовой подделки запросов
+//        http.csrf().disable()   // отключаем защиту от межсайтовой подделки запросов - не работает
         http
                 .authorizeRequests()
-                .antMatchers("/auth/login","/auth/registration", "/error", "/css/**").permitAll() // дает всем пользкам доступ
-                .anyRequest().authenticated()
+                    .antMatchers("/admin").hasRole("ADMIN") // без Role, spring сам знает это (из-за конвенции об именовании)
+                    .antMatchers("/auth/login","/auth/registration", "/error", "/css/**").permitAll() // дает всем пользкам доступ
+                    .anyRequest().hasAnyRole("USER", "ADMIN")
                 .and()
-                .formLogin()
-                .loginPage("/auth/login")
-                .loginProcessingUrl("/process_login")
-                .defaultSuccessUrl("/hello", true)
-                .failureUrl("/auth/login");
+                    .formLogin().loginPage("/auth/login")
+                    .loginProcessingUrl("/process_login")
+                    .defaultSuccessUrl("/hello", true)
+                    .failureUrl("/auth/login")
+                .and()
+                    .logout()
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/auth/login");
+
     }
 
-    // Настраиваем аутентификацию
+    // Настраиваем аутентификацию c шифрованием паролей
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(personDetailService);
+        auth.userDetailsService(personDetailService)
+                .passwordEncoder(getPasswordEncoder());
     }
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
