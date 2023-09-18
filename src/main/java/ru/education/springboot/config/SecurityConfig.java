@@ -3,6 +3,7 @@ package ru.education.springboot.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.education.springboot.services.PersonDetailService;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PersonDetailService personDetailService;
@@ -29,7 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.csrf().disable()   // отключаем защиту от межсайтовой подделки запросов - не работает
         http
                 .authorizeRequests()
-                    .antMatchers("/admin").hasRole("ADMIN") // без Role, spring сам знает это (из-за конвенции об именовании)
+                    // используем вместо этого аннотацию @EnableGlobalMethodSecurity(prePostEnabled = true)
+//                    .antMatchers("/admin").hasRole("ADMIN") // без Role, spring сам знает это (из-за конвенции об именовании)
                     .antMatchers("/auth/login","/auth/registration", "/error", "/css/**").permitAll() // дает всем пользкам доступ
                     .anyRequest().hasAnyRole("USER", "ADMIN")
                 .and()
