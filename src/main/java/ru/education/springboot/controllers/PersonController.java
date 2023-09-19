@@ -1,6 +1,8 @@
 package ru.education.springboot.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,6 +11,8 @@ import ru.education.springboot.dao.PersonDAO;
 import ru.education.springboot.models.Person;
 import ru.education.springboot.services.BookService;
 import ru.education.springboot.services.PeopleService;
+import ru.education.springboot.util.PersonErrorResponse;
+import ru.education.springboot.util.PersonNotFoundException;
 import ru.education.springboot.util.PersonValidator;
 
 import javax.validation.Valid;
@@ -42,6 +46,13 @@ public class PersonController {
         Person owner = peopleService.findOne(id);
         model.addAttribute("books", bookService.findBookByOwner(owner));
         return "people/show";
+    }
+
+    @GetMapping("/user/{id}")
+    @ResponseBody
+    public Person getUser(@PathVariable("id") int id) {
+        System.out.println(peopleService.findOne(id));
+        return peopleService.findOne(id);
     }
 
     @GetMapping("/new")
@@ -83,5 +94,14 @@ public class PersonController {
     public String delete(@PathVariable("id") int id) {
         peopleService.delete(id);
         return "redirect:/people";
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<PersonErrorResponse> handleException(PersonNotFoundException e) {
+        PersonErrorResponse response = new PersonErrorResponse(
+                "person Not Found Exception!",
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
