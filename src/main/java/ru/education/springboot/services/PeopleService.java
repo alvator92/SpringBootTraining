@@ -8,6 +8,7 @@ import ru.education.springboot.models.Book;
 import ru.education.springboot.models.Mood;
 import ru.education.springboot.models.Person;
 import ru.education.springboot.repositories.PeopleRepository;
+import ru.education.springboot.util.PersonNotFoundException;
 
 import java.util.Date;
 import java.util.List;
@@ -30,7 +31,7 @@ public class PeopleService {
 
     public Person findOne(int id) {
         Optional<Person> person = peopleRepository.findById(id);
-        return person.orElse(null);
+        return person.orElseThrow(PersonNotFoundException::new);
     }
 
     public Person findOneWithList(int id) {

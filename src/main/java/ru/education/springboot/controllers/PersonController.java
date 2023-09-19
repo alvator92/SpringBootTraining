@@ -6,16 +6,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.education.springboot.dao.PersonDAO;
 import ru.education.springboot.models.Person;
 import ru.education.springboot.services.BookService;
 import ru.education.springboot.services.PeopleService;
 import ru.education.springboot.util.PersonErrorResponse;
+import ru.education.springboot.util.PersonNotCreatedException;
 import ru.education.springboot.util.PersonNotFoundException;
 import ru.education.springboot.util.PersonValidator;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/people")
@@ -59,6 +62,7 @@ public class PersonController {
     public String newPerson(@ModelAttribute("person") Person person) {
         return "people/new";
     }
+
     @PostMapping
     public String create(@ModelAttribute("person") @Valid Person person,
                          BindingResult bindingResult) {
@@ -96,8 +100,36 @@ public class PersonController {
         return "redirect:/people";
     }
 
+    @PostMapping
+    public ResponseEntity<HttpStatus> create2(@RequestBody @Valid Person person,
+                                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMsg = new StringBuilder();
+
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for (FieldError error : errors) {
+                errorMsg.append(error.getField())
+                        .append("-").append(error.getDefaultMessage())
+                        .append(";");
+            }
+            throw new PersonNotCreatedException(errorMsg.toString());
+        }
+        peopleService.save(person);
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     @ExceptionHandler
     private ResponseEntity<PersonErrorResponse> handleException(PersonNotFoundException e) {
+        PersonErrorResponse response = new PersonErrorResponse(
+                "person Not Found Exception!",
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<PersonErrorResponse> handleException(PersonNotCreatedException e) {
         PersonErrorResponse response = new PersonErrorResponse(
                 "person Not Found Exception!",
                 System.currentTimeMillis()
