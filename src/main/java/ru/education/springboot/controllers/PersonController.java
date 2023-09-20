@@ -1,5 +1,6 @@
 package ru.education.springboot.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.education.springboot.dao.PersonDAO;
+import ru.education.springboot.dto.PersonDTO;
 import ru.education.springboot.models.Person;
 import ru.education.springboot.services.BookService;
 import ru.education.springboot.services.PeopleService;
@@ -19,6 +21,7 @@ import ru.education.springboot.util.PersonValidator;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/people")
@@ -28,19 +31,27 @@ public class PersonController {
     private final PeopleService peopleService;
     private final BookService bookService;
     private final PersonValidator personValidator;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public PersonController(PersonDAO personDAO, PeopleService peopleService, BookService bookService, PersonValidator personValidator) {
+    public PersonController(PersonDAO personDAO, PeopleService peopleService, BookService bookService, PersonValidator personValidator, ModelMapper modelMapper) {
         this.personDAO = personDAO;
         this.peopleService = peopleService;
         this.bookService = bookService;
         this.personValidator = personValidator;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping()
     public String index(Model model) {
         model.addAttribute("people", peopleService.findAll());
         return "people/index";
+    }
+
+    @GetMapping()
+    public List<PersonDTO> getPeople() {
+        return peopleService.findAll().stream().map(this::convertToPersonDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -101,7 +112,7 @@ public class PersonController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create2(@RequestBody @Valid Person person,
+    public ResponseEntity<HttpStatus> create2(@RequestBody @Valid PersonDTO personDTO,
                                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMsg = new StringBuilder();
@@ -114,7 +125,7 @@ public class PersonController {
             }
             throw new PersonNotCreatedException(errorMsg.toString());
         }
-        peopleService.save(person);
+        peopleService.save(convertToPerson(personDTO));
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -135,5 +146,13 @@ public class PersonController {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    private Person convertToPerson(PersonDTO personDTO) {
+        return modelMapper.map(personDTO, Person.class);
+    }
+
+    private PersonDTO convertToPersonDTO(Person person) {
+        return modelMapper.map(person, PersonDTO.class);
     }
 }

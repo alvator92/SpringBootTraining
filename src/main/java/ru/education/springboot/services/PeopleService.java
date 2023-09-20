@@ -10,6 +10,7 @@ import ru.education.springboot.models.Person;
 import ru.education.springboot.repositories.PeopleRepository;
 import ru.education.springboot.util.PersonNotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -42,9 +43,16 @@ public class PeopleService {
 
     @Transactional
     public void save(Person person) {
-        person.setCreatedAt(new Date());
-        person.setMood(Mood.CALM);
+        enrichPerson(person);
         peopleRepository.save(person);
+    }
+
+    private void enrichPerson(Person person) {
+        person.setCreatedAt(new Date());
+        person.setUpdatedAt(LocalDateTime.now());
+        person.setCreatedWho("ADMIN");// Тут можно брать инфу из Spring Security, кто вносит изменения
+        person.setMood(Mood.CALM);
+
     }
 
     @Transactional
